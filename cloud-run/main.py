@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 
 from flask import Flask, request
@@ -7,26 +8,27 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def index():
-    req = request.get_json()
+    envelope = request.get_json()
     resp = {'status': 'Done', 'errMsg': ''}
 
-    if not req:
+    if not envelope:
         msg = 'No Pub/Sub Message Received'
         print(msg)
         resp['status'] = 'Bad Request'
         resp['errMsg'] = msg
         return (resp, 400)
 
-    if not isinstance(req, dict) or 'message' not in req:
+    if not isinstance(envelope, dict) or 'message' not in envelope:
         msg = 'invalid Pub/Sub message format'
-        print(f'{msg}, req:\n{req}')
+        print(f'{msg}, req:\n{envelope}')
         resp['status'] = 'Bad Request'
         resp['errMsg'] = msg
         return (resp, 400)
 
-    message = req['message']
+    message = envelope['message']
     print(f'message type: {type(message)}, body:\n{message}')
     data = base64.b64decode(message["data"]).decode("utf-8").strip()
+    data = json.loads(data)
     print(f'data type: {type(data)}, value:\n{data}')
     print(f"attributes type: {type(message['attributes'])}, value:\n{message['attributes']}")
 

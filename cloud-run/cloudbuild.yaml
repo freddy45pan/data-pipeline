@@ -1,0 +1,33 @@
+steps:
+  - id: 'building image'
+    name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "builds",
+        "submit",
+        "--tag=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA",
+        "--region=asia-east1",
+        "--gcs-log-dir=gs://$PROJECT_ID/cloud-build/logs",
+        "--gcs-source-staging-dir=gs://$PROJECT_ID/cloud-build/source-staging"
+      ]
+    dir: "./cloud-run"
+
+  - id: 'deploying image'
+    name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run",
+        "deploy",
+        "${_SERVICE_NAME}",
+        "--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA",
+        "--region=asia-east1",
+        "--platform=managed",
+        "--cpu=1",
+        "--memory=128Mi",
+        "--max-instances=1",
+        "--port=8080",
+      ]
+    dir: "./cloud-run"
+
+substitutions:
+  _SERVICE_NAME: 'pubsub-notification'

@@ -6,7 +6,6 @@ steps:
         "builds",
         "submit",
         "--tag=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA",
-        "--region=asia-east1",
         "--gcs-log-dir=gs://$PROJECT_ID/cloud-build/logs",
         "--gcs-source-staging-dir=gs://$PROJECT_ID/cloud-build/source-staging"
       ]

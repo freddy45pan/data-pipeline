@@ -6,6 +6,8 @@ steps:
         'build',
         '-t',
         'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA',
+        '-t',
+        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest',
         '.'
       ]
     dir: './cloud-run'
@@ -15,7 +17,8 @@ steps:
     args:
       [
         'push',
-        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}'
+        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}',
+        '--all-tags'
       ]
     dir: './cloud-run'
 
@@ -26,7 +29,7 @@ steps:
         'run',
         'deploy',
         '${_SERVICE_NAME}',
-        '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA',
+        '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest',
         '--region=asia-east1',
         '--platform=managed',
         '--cpu=1',

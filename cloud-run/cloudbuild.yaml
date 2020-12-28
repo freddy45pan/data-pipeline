@@ -9,7 +9,6 @@ steps:
         "--gcs-log-dir=gs://$PROJECT_ID/cloud-build/logs",
         "--gcs-source-staging-dir=gs://$PROJECT_ID/cloud-build/source-staging"
       ]
-    dir: "./cloud-run"
 
   - id: 'deploying image'
     name: "gcr.io/cloud-builders/gcloud"
@@ -26,7 +25,6 @@ steps:
         "--max-instances=1",
         "--port=8080",
       ]
-    dir: "./cloud-run"
 
 substitutions:
   _SERVICE_NAME: 'pubsub-notification'

@@ -17,7 +17,6 @@ steps:
     args:
       [
         'push',
-        '--all-tags',
         'gcr.io/$PROJECT_ID/${_SERVICE_NAME}',
       ]
     dir: './cloud-run'

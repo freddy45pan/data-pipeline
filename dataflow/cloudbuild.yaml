@@ -1,0 +1,42 @@
+steps:
+  - id: 'build image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$SHORT_SHA',
+        '-t',
+        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest',
+        '.'
+      ]
+    dir: './dataflow'
+    waitFor: ['-']
+
+  - id: 'push image'
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'gcr.io/$PROJECT_ID/${_SERVICE_NAME}',
+      ]
+    dir: './dataflow'
+    waitFor: ['build image']
+
+  - id: 'create template'
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      [
+        'dataflow',
+        'flex-template',
+        'build',
+        'gs://$PROJECT_ID/dataflow/template/${_SERVICE_NAME}.json',
+        '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}',
+        '--sdk-language=PYTHON',
+        '--metadata-file=metadata.json'
+      ]
+    dir: './dataflow'
+    waitFor: ['push image']
+
+substitutions:
+  _SERVICE_NAME: 'dataflow-notification'

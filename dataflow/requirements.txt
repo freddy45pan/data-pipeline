@@ -1,0 +1,4 @@
+pandas
+apache-beam[gcp]==2.26.0
+fsspec
+gcsfs

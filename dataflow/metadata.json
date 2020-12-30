@@ -1,0 +1,16 @@
+{
+    "name": "Notification flex template",
+    "description": "Cloud Storage Pub/Sub notification flex template.",
+    "parameters": [
+        {
+            "name": "input",
+            "label": "Input file path",
+            "helpText": "Path of the file to read from"
+        },
+        {
+            "name": "dataset",
+            "label": "BigQuery dataset",
+            "helpText": "GCP BigQuery dataset"
+        }
+    ]
+}

@@ -8,7 +8,7 @@ from apache_beam.options.pipeline_options import (GoogleCloudOptions,
                                                   SetupOptions,
                                                   StandardOptions)
 
-from .table import SCHEMA, TABLE_ID
+from bigquery.table import SCHEMA, TABLE_ID
 
 
 class MyOptions(PipelineOptions):

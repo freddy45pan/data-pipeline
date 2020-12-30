@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y libffi-dev && rm -rf /var/lib/apt/lists
 
 COPY requirements.txt .
 COPY main.py .
-COPY table.py .
+COPY bigquery ./bigquery
 
 ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE="${WORKDIR}/requirements.txt"
 ENV FLEX_TEMPLATE_PYTHON_PY_FILE="${WORKDIR}/main.py"

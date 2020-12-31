@@ -1,5 +1,4 @@
 import logging
-import argparse
 import os
 
 import apache_beam as beam
@@ -12,11 +11,11 @@ from apache_beam.options.pipeline_options import (GoogleCloudOptions,
 from bigquery.table import SCHEMA, TABLE_ID
 
 
-# class MyOptions(PipelineOptions):
-#     @classmethod
-#     def _add_argparse_args(cls, parser):
-#         parser.add_argument('--input', help='Path of the file to read from')
-#         parser.add_argument('--dataset', help='GCP BigQuery dataset')
+class MyOptions(PipelineOptions):
+    @classmethod
+    def _add_argparse_args(cls, parser):
+        parser.add_argument('--input', help='Path of the file to read from')
+        parser.add_argument('--dataset', help='GCP BigQuery dataset')
 
 class ReadData(beam.PTransform):
     def __init__(self, filepath: str):
@@ -26,8 +25,6 @@ class ReadData(beam.PTransform):
 
         self.beers = os.path.join(filepath, 'beers.csv')
         self.breweries = os.path.join(filepath, 'breweries.csv')
-        logging.info(f'beers: {self.beers}')
-        logging.info(f'beers: {self.breweries}')
 
     def expand(self, p):
         def read_data(file: str) -> pd.DataFrame:
@@ -68,27 +65,20 @@ class ConvertType(beam.DoFn):
         element['ounces'] = float(element['ounces']) if element['ounces'] != None else None
         yield element
 
-def run(args, pipeline_args):
-    pipeline_options = PipelineOptions(pipeline_args)
-
-    # my_options = pipeline_options.view_as(MyOptions)
-    # logging.info(f'my_options: {my_options}')
+def run():
+    pipeline_options = PipelineOptions()
+    my_options = pipeline_options.view_as(MyOptions)
     google_cloud_options = pipeline_options.view_as(GoogleCloudOptions)
-    logging.info(f'google_cloud_options: {google_cloud_options}')
-    standard_options = pipeline_options.view_as(StandardOptions)
-    logging.info(f'standard_options: {standard_options}')
-    setup_options = pipeline_options.view_as(SetupOptions)
-    logging.info(f'setup_options: {setup_options}')
 
     with beam.Pipeline(options=pipeline_options) as pipeline:
         (
             pipeline
-            | 'Read Data' >> ReadData(args.input)
+            | 'Read Data' >> ReadData(my_options.input)
             | 'Clean Data' >> beam.ParDo(CleanData())
             | 'Convert Data Type' >> beam.ParDo(ConvertType())
             | 'To BigQuery' >> beam.io.WriteToBigQuery(
                 TABLE_ID,
-                dataset=args.dataset,
+                dataset=my_options.dataset,
                 project=google_cloud_options.project,
                 schema=SCHEMA,
                 create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
@@ -98,14 +88,6 @@ def run(args, pipeline_args):
             )
         )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input', help='Path of the file to read from')
-    parser.add_argument('--dataset', help='GCP BigQuery dataset')
-    args, pipeline_args = parser.parse_known_args()
-    logging.info(f'args: {args}')
-    logging.info(f'pipeline_args: {pipeline_args}')
-
-    run(args, pipeline_args)
+    run()

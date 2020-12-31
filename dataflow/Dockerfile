@@ -9,12 +9,11 @@ WORKDIR ${WORKDIR}
 # https://github.com/GoogleCloudPlatform/python-docs-samples/issues/4891
 RUN apt-get update && apt-get install -y libffi-dev && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-COPY main.py .
-COPY bigquery ./bigquery
+COPY bigquery ${WORKDIR}/bigquery
+COPY setup.py ${WORKDIR}/setup.py 
+COPY main.py ${WORKDIR}/main.py
 
-ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE="${WORKDIR}/requirements.txt"
+ENV FLEX_TEMPLATE_PYTHON_SETUP_FILE="${WORKDIR}/setup.py"
 ENV FLEX_TEMPLATE_PYTHON_PY_FILE="${WORKDIR}/main.py"
 
-RUN pip install -U pip
-RUN pip install -U -r requirements.txt
+RUN pip install -U apache-beam[gcp] pandas fsspec gcsfs
